@@ -37,4 +37,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: "eu-north-1" # change this to your AWS region
-          SOURCE_DIR: "build" # change this to the directory containing your built application
+          SOURCE_DIR: "dist" # change this to the directory containing your built application
