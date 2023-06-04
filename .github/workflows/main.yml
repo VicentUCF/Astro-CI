@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: S3
 
     steps:
       - uses: actions/checkout@main
