@@ -27,14 +27,24 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Deploy to S3
-      - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@master
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          args: --follow-symlinks --delete --exclude '.git/*'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1 # change this to your AWS region
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
         env:
-          AWS_S3_BUCKET: "angular-ci-s3"
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "eu-north-1" # change this to your AWS region
-          SOURCE_DIR: "dist" # change this to the directory containing your built application
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: kore
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
